@@ -96,7 +96,7 @@ RenderPipe.prototype.renderStatic = function (out, cb) {
 
         mkdirp(outDir, function (err) {
             if (err) {
-                return next(err);
+                return cb(err);
             }
 
             self.renderFile(srcPath, function (err, html) {
@@ -104,11 +104,17 @@ RenderPipe.prototype.renderStatic = function (out, cb) {
                     if (err instanceof NoExtendsError) {
                         return next(); // Skip it
                     } else {
-                        return next(err);
+                        return cb(err);
                     }
                 }
 
-                fs.writeFile(path.join(outDir, outName), html, next);
+                fs.writeFile(path.join(outDir, outName), html, function (err) {
+                    if (err) {
+                        cb(err);
+                    } else {
+                        next();
+                    }
+                });
             });
         });
     });
