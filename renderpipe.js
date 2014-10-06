@@ -12,7 +12,7 @@ function NotFoundError(file) {
     this.message = file + " not found";
     this.stack = (new Error(this.message)).stack;
 }
-NotFoundError.prototype = new Error;
+NotFoundError.prototype = new Error();
 
 // Not an output file
 function NoExtendsError(file) {
@@ -20,7 +20,7 @@ function NoExtendsError(file) {
     this.message = file + " does not use a template";
     this.stack = (new Error(this.message)).stack;
 }
-NoExtendsError.prototype = new Error;
+NoExtendsError.prototype = new Error();
 
 function RenderPipe(dir) {
     this.dir = dir || __dirname;
@@ -85,7 +85,7 @@ RenderPipe.prototype.renderFile = function (file, cb) {
 RenderPipe.prototype.renderStatic = function (out, cb) {
     var self = this;
 
-    var walker = walk.walk(this.dir);    
+    var walker = walk.walk(this.dir);
     walker.on("file", function (root, stats, next) {
         if (!stats.name.match(/\.jade$/)) {
             return next();
