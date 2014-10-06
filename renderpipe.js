@@ -100,8 +100,12 @@ RenderPipe.prototype.renderStatic = function (out, cb) {
             }
 
             self.renderFile(srcPath, function (err, html) {
-                if (err instanceof NoExtendsError) {
-                    return next(); // Skip it
+                if (err) {
+                    if (err instanceof NoExtendsError) {
+                        return next(); // Skip it
+                    } else {
+                        return next(err);
+                    }
                 }
 
                 fs.writeFile(path.join(outDir, outName), html, next);
