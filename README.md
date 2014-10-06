@@ -2,6 +2,8 @@
 
 > Trivial rendering pipe for HTML prototypes
 
+[![Build Status](https://travis-ci.org/rubenv/renderpipe.png?branch=master)](https://travis-ci.org/rubenv/renderpipe)
+
 ## License 
 
     (The MIT License)
