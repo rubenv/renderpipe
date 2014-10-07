@@ -134,7 +134,7 @@ RenderPipe.prototype.renderStatic = function (out, cb) {
 
 RenderPipe.prototype.readAsset = function (filename) {
     if (!this.assets[filename]) {
-        this.assets[filename] = fs.readFileSync(path.join(this.dir, filename), 'utf8');
+        this.assets[filename] = fs.readFileSync(path.join(this.dir, filename), "utf8");
     }
     return this.assets[filename];
 };
