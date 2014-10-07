@@ -24,6 +24,11 @@ NoExtendsError.prototype = new Error();
 function RenderPipe(dir) {
     this.dir = dir || __dirname;
     this.renderRequest = this.renderRequest.bind(this);
+    this.readAsset = this.readAsset.bind(this);
+    this.readJsonAsset = this.readJsonAsset.bind(this);
+
+    this.assets = {};
+    this.jsonAssets = {};
 }
 
 RenderPipe.prototype.listen = function (port) {
@@ -53,6 +58,8 @@ RenderPipe.prototype.renderRequest = function (req, res, next) {
 };
 
 RenderPipe.prototype.renderFile = function (file, cb) {
+    var self = this;
+
     fs.exists(file, function (exists) {
         if (!exists) {
             return cb(new NotFoundError(file));
@@ -73,7 +80,11 @@ RenderPipe.prototype.renderFile = function (file, cb) {
 
             try {
                 var render = jade.compileFile(file, {});
-                cb(null, render({}));
+                cb(null, render({
+                    read: self.readAsset,
+                    readJson: self.readJsonAsset,
+                    filename: path.basename(file),
+                }));
             } catch (e) {
                 cb(e);
             }
@@ -119,6 +130,20 @@ RenderPipe.prototype.renderStatic = function (out, cb) {
         });
     });
     walker.on("end", cb);
+};
+
+RenderPipe.prototype.readAsset = function (filename) {
+    if (!this.assets[filename]) {
+        this.assets[filename] = fs.readFileSync(path.join(this.dir, filename), 'utf8');
+    }
+    return this.assets[filename];
+};
+
+RenderPipe.prototype.readJsonAsset = function (filename) {
+    if (!this.jsonAssets[filename]) {
+        this.jsonAssets[filename] = JSON.parse(this.readAsset(filename));
+    }
+    return this.jsonAssets[filename];
 };
 
 module.exports = RenderPipe;
