@@ -4,6 +4,7 @@ var jade = require("jade");
 var mkdirp = require("mkdirp");
 var path = require("path");
 var walk = require("walk");
+var url = require("url");
 
 // Not found
 function NotFoundError(file) {
@@ -42,7 +43,8 @@ RenderPipe.prototype.listen = function (port) {
 };
 
 RenderPipe.prototype.renderRequest = function (req, res, next) {
-    var file = path.join(this.dir, req.url).replace(/\.html$/, ".jade");
+    var reqpath = url.parse(req.url).pathname;
+    var file = path.join(this.dir, reqpath).replace(/\.html$/, ".jade");
 
     this.renderFile(file, function (err, html) {
         if (err) {
