@@ -42,7 +42,7 @@ RenderPipe.prototype.listen = function (port) {
 };
 
 RenderPipe.prototype.renderRequest = function (req, res, next) {
-    var file = path.join(this.dir, req.path).replace(/\.html$/, ".jade");
+    var file = path.join(this.dir, req.url).replace(/\.html$/, ".jade");
 
     this.renderFile(file, function (err, html) {
         if (err) {
@@ -53,7 +53,7 @@ RenderPipe.prototype.renderRequest = function (req, res, next) {
             }
         }
 
-        res.send(html);
+        res.end(html);
     });
 };
 
