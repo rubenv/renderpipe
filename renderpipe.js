@@ -76,7 +76,7 @@ RenderPipe.prototype.renderFile = function (file, cb) {
                 return cb(err);
             }
 
-            if (!src.match(/^extends/)) {
+            if (!src.match(/(^|\n)extends/)) {
                 return cb(new NoExtendsError(file));
             }
 
