@@ -1,7 +1,7 @@
 {
   "name": "renderpipe",
   "description": "Trivial rendering pipe for HTML prototypes",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "author": {
     "name": "Ruben Vermeersch",
     "email": "ruben@rocketeer.be",
