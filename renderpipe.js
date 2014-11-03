@@ -148,4 +148,9 @@ RenderPipe.prototype.readJsonAsset = function (filename) {
     return this.jsonAssets[filename];
 };
 
+RenderPipe.prototype.flushCache = function () {
+    this.assets = {};
+    this.jsonAssets = {};
+};
+
 module.exports = RenderPipe;
