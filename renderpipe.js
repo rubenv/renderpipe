@@ -25,6 +25,7 @@ NoExtendsError.prototype = new Error();
 function RenderPipe(dir) {
     this.dir = dir || __dirname;
     this.renderRequest = this.renderRequest.bind(this);
+    this.renderInclude = this.renderInclude.bind(this);
     this.readAsset = this.readAsset.bind(this);
     this.readJsonAsset = this.readJsonAsset.bind(this);
 
@@ -60,37 +61,41 @@ RenderPipe.prototype.renderRequest = function (req, res, next) {
 };
 
 RenderPipe.prototype.renderFile = function (file, cb) {
-    var self = this;
+    try {
+        var html = this.renderJade(file, true);
+        cb(null, html);
+    } catch (e) {
+        cb(e);
+    }
+};
 
-    fs.exists(file, function (exists) {
-        if (!exists) {
-            return cb(new NotFoundError(file));
-        }
+RenderPipe.prototype.renderInclude = function (file) {
+    return this.renderJade(path.join(this.dir, file), false, {
+        pretty: true,
+    });
+};
 
-        if (!file.match(/\.jade/)) {
-            return cb(new Error(file + " does not look like a Jade file"));
-        }
+RenderPipe.prototype.renderJade = function (file, require_extends, options) {
+    var exists = fs.existsSync(file);
+    if (!exists) {
+        throw new NotFoundError(file);
+    }
 
-        fs.readFile(file, "utf8", function (err, src) {
-            if (err) {
-                return cb(err);
-            }
+    if (!file.match(/\.jade/)) {
+        throw new Error(file + " does not look like a Jade file");
+    }
 
-            if (!src.match(/(^|\n)extends/)) {
-                return cb(new NoExtendsError(file));
-            }
+    var src = fs.readFileSync(file, "utf8");
+    if (require_extends && !src.match(/(^|\n)extends/)) {
+        throw new NoExtendsError(file);
+    }
 
-            try {
-                var render = jade.compileFile(file, {});
-                cb(null, render({
-                    read: self.readAsset,
-                    readJson: self.readJsonAsset,
-                    filename: path.basename(file),
-                }));
-            } catch (e) {
-                cb(e);
-            }
-        });
+    var render = jade.compileFile(file, options || {});
+    return render({
+        render: this.renderInclude,
+        read: this.readAsset,
+        readJson: this.readJsonAsset,
+        filename: path.basename(file),
     });
 };
 
